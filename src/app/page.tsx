@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { Play, Loader2, Code, Terminal, RefreshCw, Copy, Check, Trash, Info, ExternalLink, Zap } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -16,47 +16,6 @@ export default function Home() {
 
   const editorRef = useRef<HTMLTextAreaElement>(null)
   const outputRef = useRef<HTMLDivElement>(null)
-
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+Enter to run code
-      if (e.ctrlKey && e.key === "Enter") {
-        e.preventDefault()
-        handleRun()
-      }
-
-      // Ctrl+L to clear output
-      if (e.ctrlKey && e.key === "l") {
-        e.preventDefault()
-        setOutput("")
-      }
-
-      // Ctrl+S to save to history
-      if (e.ctrlKey && e.key === "s" && code.trim()) {
-        e.preventDefault()
-        saveToHistory()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [code, loading])
-
-  // Auto-resize textarea based on content
-  useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.style.height = "auto"
-      editorRef.current.style.height = `${editorRef.current.scrollHeight}px`
-    }
-  }, [code])
-
-  // Scroll to bottom of output when it changes
-  useEffect(() => {
-    if (outputRef.current) {
-      outputRef.current.scrollTop = outputRef.current.scrollHeight
-    }
-  }, [output])
 
   const handleRun = async () => {
     if (!code.trim() || loading) return
@@ -87,6 +46,7 @@ export default function Home() {
         document.getElementById("output-section")?.scrollIntoView({ behavior: "smooth" })
       }
     } catch (err) {
+      console.error("Error running code:", err)
       setOutput("❌ Failed to reach interpreter server.")
     } finally {
       setLoading(false)
